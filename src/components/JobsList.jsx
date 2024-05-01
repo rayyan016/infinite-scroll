@@ -1,32 +1,75 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Card, CardContent, Typography } from "@mui/material";
 
 const JobsList = () => {
   const [jobDetails, setJobDetails] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [hasMore, setHasMore] = useState(true);
+  const pageRef = useRef(0);
 
   useEffect(() => {
     fetchJobDetails();
   }, []);
 
   const fetchJobDetails = async () => {
+    if (!hasMore || isLoading) return;
+
+    setIsLoading(true);
+
     try {
       const myHeaders = new Headers();
       myHeaders.append("Content-Type", "application/json");
 
+      const limit = 10; // Number of results per page
+      const offset = (pageRef.current) * limit; // Calculate offset for pagination
+
+      const raw = JSON.stringify({
+        limit: limit,
+        offset: offset,
+      });
+
       const requestOptions = {
         method: "POST",
         headers: myHeaders,
+        body: raw,
       };
+
       const response = await fetch(
         "https://api.weekday.technology/adhoc/getSampleJdJSON",
         requestOptions
       );
       const data = await response.json();
-      setJobDetails(data.jdList);
+
+      // Check if there are more results
+      if (data.jdList.length === 0) {
+        setHasMore(false);
+      } else {
+        setJobDetails((prevJobDetails) => [...prevJobDetails, ...data.jdList]);
+        pageRef.current++;
+      }
     } catch (error) {
       console.error("Error fetching job details:", error);
+    } finally {
+      setIsLoading(false);
     }
   };
+
+  const handleScroll = () => {
+    if (
+      document.documentElement.offsetHeight -
+        parseInt(window.innerHeight + document.documentElement.scrollTop) >
+        10 ||
+      isLoading
+    ) {
+      return;
+    }
+    fetchJobDetails();
+  };
+
+  useEffect(() => {
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-12 gap-y-8">
@@ -52,6 +95,8 @@ const JobsList = () => {
           </CardContent>
         </Card>
       ))}
+      {isLoading && <div>Loading...</div>}
+      {!isLoading && !hasMore && <div>No more jobs</div>}
     </div>
   );
 };
