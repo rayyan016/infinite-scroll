@@ -247,7 +247,15 @@ const JobsList = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-12 gap-y-8">
         {/* Render filtered job details */}
         {filteredJobDetailsBySalary.map((job, index) => (
-          <Card key={index} className="w-11/12">
+          <Card
+            key={index}
+            className="w-11/12"
+            sx={{
+              ":hover": {
+                boxShadow: 5, 
+              },
+            }}
+          >
             <CardContent className="">
               <div className="flex gap-x-2">
                 <AcUnitIcon className="mt-[1px]" />
@@ -277,7 +285,8 @@ const JobsList = () => {
                 {job.maxExp != null ? job.maxExp : "N/A"} years
               </Typography>
               <Button
-                className="w-full"
+              
+                className="w-full h-12"
                 variant="contained"
                 color="success"
                 href={job.jdLink}
@@ -297,6 +306,11 @@ const JobsList = () => {
         </div>
       )}
       {!isLoading && !hasMore && <div>No more jobs</div>}
+      {filteredJobDetailsBySalary.length === 0 && (
+        <div className="grid place-content-center mt-8 text-3xl">
+          No jobs available
+        </div>
+      )}
     </>
   );
 };
