@@ -13,6 +13,7 @@ import {
   MenuItem,
 } from "@mui/material";
 import ElectricBoltIcon from "@mui/icons-material/ElectricBolt";
+import AcUnitIcon from "@mui/icons-material/AcUnit";
 
 const RolesArray = [
   "Frontend",
@@ -215,10 +216,13 @@ const JobsList = () => {
         {/* Render filtered job details */}
         {filteredJobDetails.map((job, index) => (
           <Card key={index} className="w-11/12">
-            <CardContent className="bg-emerald-100">
-              <Typography variant="h5" component="div">
-                {job.jobRole}
-              </Typography>
+            <CardContent className="">
+              <div className="flex gap-x-2">
+                <AcUnitIcon className="mt-[1px]" />
+                <Typography variant="h5" component="div">
+                  {job.jobRole}
+                </Typography>
+              </div>
               <Typography color="textSecondary" gutterBottom>
                 {job.location}
               </Typography>
