@@ -5,13 +5,27 @@ import {
   CardContent,
   CircularProgress,
   Typography,
+  Autocomplete,
+  TextField,
 } from "@mui/material";
 import ElectricBoltIcon from "@mui/icons-material/ElectricBolt";
+
+const RolesArray = [
+  "Frontend",
+  "Backend",
+  "Tech Lead",
+  "Ios",
+  "Android",
+  "Fullstack",
+  "Data Engineer",
+  "Data Science",
+];
 
 const JobsList = () => {
   const [jobDetails, setJobDetails] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
+  const [selectedJobRoles, setSelectedJobRoles] = useState([]); // State to hold selected job roles
   const pageRef = useRef(17);
 
   useEffect(() => {
@@ -79,10 +93,45 @@ const JobsList = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  const handleRoleFilterChange = (event, newValue) => {
+    setSelectedJobRoles(newValue);
+  };
+
+  const filteredJobDetails =
+    selectedJobRoles.length > 0
+      ? jobDetails.filter((job) => {
+          return selectedJobRoles.some(
+            (role) => role.toLowerCase() === job.jobRole.toLowerCase()
+          );
+        })
+      : jobDetails;
+
   return (
     <>
+      <div
+        className="mb-6"
+        style={{
+          width: `${
+            selectedJobRoles.length * 100 < 250
+              ? 400
+              : selectedJobRoles.length * 170
+          }px`,
+        }}
+      >
+        <Autocomplete
+          multiple
+          value={selectedJobRoles}
+          onChange={handleRoleFilterChange}
+          options={RolesArray}
+          renderInput={(params) => (
+            <TextField {...params} label="Select Job Roles" />
+          )}
+        />
+      </div>
+
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-12 gap-y-8">
-        {jobDetails.map((job, index) => (
+        {/* Render filtered job details */}
+        {filteredJobDetails.map((job, index) => (
           <Card key={index} className="w-11/12">
             <CardContent className="bg-emerald-100">
               <Typography variant="h5" component="div">
