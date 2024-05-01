@@ -25,12 +25,15 @@ const RolesArray = [
   "Data Science",
 ];
 
+const LocationsArray = ["Remote", "Hybrid", "In-office"];
+
 const JobsList = () => {
   const [jobDetails, setJobDetails] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const [selectedJobRoles, setSelectedJobRoles] = useState([]); // State to hold selected job roles
   const [selectedExperience, setSelectedExperience] = useState(""); // State to hold selected experience
+  const [selectedLocations, setSelectedLocations] = useState([]);
   const pageRef = useRef(30);
 
   useEffect(() => {
@@ -106,21 +109,46 @@ const JobsList = () => {
     setSelectedExperience(event.target.value);
   };
 
-  const filteredJobDetails =
+  const handleLocationFilterChange = (event, newValue) => {
+    setSelectedLocations(newValue);
+    console.log(newValue);
+  };
+
+  const filteredJobDetailsByRoles =
     selectedJobRoles.length > 0
-      ? jobDetails.filter((job) => {
-          return selectedJobRoles.some(
+      ? jobDetails.filter((job) =>
+          selectedJobRoles.some(
             (role) => role.toLowerCase() === job.jobRole.toLowerCase()
-          );
-        })
+          )
+        )
       : jobDetails;
 
   const filteredJobDetailsByExperience =
     selectedExperience !== ""
-      ? filteredJobDetails.filter(
+      ? filteredJobDetailsByRoles.filter(
           (job) => job.minExp !== null && job.minExp >= selectedExperience
         )
-      : filteredJobDetails;
+      : filteredJobDetailsByRoles;
+
+  let filteredJobDetails =
+    selectedLocations.length > 0
+      ? filteredJobDetailsByExperience.filter((job) =>
+          selectedLocations.some(
+            (location) => location.toLowerCase() === job.location.toLowerCase()
+          )
+        )
+      : filteredJobDetailsByExperience;
+
+  // If "in-office" is selected, append entries where location is neither "remote" nor "hybrid"
+  if (selectedLocations.includes("In-office")) {
+    filteredJobDetails = [
+      ...filteredJobDetails,
+      ...filteredJobDetailsByExperience.filter(
+        (job) => !["remote", "hybrid"].includes(job.location.toLowerCase())
+      ),
+    ];
+  }
+
   return (
     <>
       <div
@@ -138,17 +166,13 @@ const JobsList = () => {
           value={selectedJobRoles}
           onChange={handleRoleFilterChange}
           options={RolesArray}
-          renderInput={(params) => (
-            <TextField {...params} label="Job Roles" />
-          )}
+          renderInput={(params) => <TextField {...params} label="Job Roles" />}
         />
       </div>
 
       <div className="ml-2 mb-6 inline-block w-48">
         <FormControl fullWidth>
-          <InputLabel >
-            Select Experience
-          </InputLabel>
+          <InputLabel>Select Experience</InputLabel>
           <Select
             labelId="experience-filter-label"
             label="Select Experience"
@@ -166,9 +190,30 @@ const JobsList = () => {
         </FormControl>
       </div>
 
+      <div
+        className="ml-2 mb-6 inline-block"
+        style={{
+          width: `${
+            selectedLocations.length * 100 < 150
+              ? 250
+              : selectedLocations.length * 160
+          }px`,
+        }}
+      >
+        <Autocomplete
+          multiple
+          value={selectedLocations}
+          onChange={handleLocationFilterChange}
+          options={LocationsArray}
+          renderInput={(params) => (
+            <TextField {...params} label="Job Locations" />
+          )}
+        />
+      </div>
+
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-12 gap-y-8">
         {/* Render filtered job details */}
-        {filteredJobDetailsByExperience.map((job, index) => (
+        {filteredJobDetails.map((job, index) => (
           <Card key={index} className="w-11/12">
             <CardContent className="bg-emerald-100">
               <Typography variant="h5" component="div">
