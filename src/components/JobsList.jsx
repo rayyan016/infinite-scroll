@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Card, CardContent, Typography } from "@mui/material";
+import { Card, CardContent, CircularProgress, Typography } from "@mui/material";
 
 const JobsList = () => {
   const [jobDetails, setJobDetails] = useState([]);
@@ -21,7 +21,7 @@ const JobsList = () => {
       myHeaders.append("Content-Type", "application/json");
 
       const limit = 10; // Number of results per page
-      const offset = (pageRef.current) * limit; // Calculate offset for pagination
+      const offset = pageRef.current * limit; // Calculate offset for pagination
 
       const raw = JSON.stringify({
         limit: limit,
@@ -48,7 +48,7 @@ const JobsList = () => {
         pageRef.current++;
       }
     } catch (error) {
-      console.error("Error fetching job details:", error);
+      console.error("Error fetching job details: ", error);
     } finally {
       setIsLoading(false);
     }
@@ -62,8 +62,9 @@ const JobsList = () => {
       isLoading
     ) {
       return;
+    } else {
+      fetchJobDetails();
     }
-    fetchJobDetails();
   };
 
   useEffect(() => {
@@ -72,32 +73,38 @@ const JobsList = () => {
   }, []);
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-12 gap-y-8">
-      {jobDetails.map((job, index) => (
-        <Card key={index} className="w-11/12">
-          <CardContent className="bg-emerald-100">
-            <Typography variant="h5" component="div">
-              {job.jobRole}
-            </Typography>
-            <Typography color="textSecondary" gutterBottom>
-              {job.location}
-            </Typography>
-            <Typography variant="body2" component="p">
-              {job.jobDetailsFromCompany}
-            </Typography>
-            <Typography color="textSecondary" gutterBottom>
-              Salary: {job.minJdSalary} - {job.maxJdSalary}{" "}
-              {job.salaryCurrencyCode}
-            </Typography>
-            <Typography color="textSecondary">
-              Experience: {job.minExp} - {job.maxExp} years
-            </Typography>
-          </CardContent>
-        </Card>
-      ))}
-      {isLoading && <div>Loading...</div>}
+    <>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-12 gap-y-8">
+        {jobDetails.map((job, index) => (
+          <Card key={index} className="w-11/12">
+            <CardContent className="bg-emerald-100">
+              <Typography variant="h5" component="div">
+                {job.jobRole}
+              </Typography>
+              <Typography color="textSecondary" gutterBottom>
+                {job.location}
+              </Typography>
+              <Typography variant="body2" component="p">
+                {job.jobDetailsFromCompany}
+              </Typography>
+              <Typography color="textSecondary" gutterBottom>
+                Salary: {job.minJdSalary} - {job.maxJdSalary}{" "}
+                {job.salaryCurrencyCode}
+              </Typography>
+              <Typography color="textSecondary">
+                Experience: {job.minExp} - {job.maxExp} years
+              </Typography>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+      {isLoading && (
+        <div className="mt-8 flex justify-center">
+          <CircularProgress />
+        </div>
+      )}
       {!isLoading && !hasMore && <div>No more jobs</div>}
-    </div>
+    </>
   );
 };
 
