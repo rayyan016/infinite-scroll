@@ -35,6 +35,7 @@ const JobsList = () => {
   const [selectedJobRoles, setSelectedJobRoles] = useState([]); // State to hold selected job roles
   const [selectedExperience, setSelectedExperience] = useState(""); // State to hold selected experience
   const [selectedLocations, setSelectedLocations] = useState([]);
+  const [selectedSalary, setSelectedSalary] = useState(""); // State to hold selected salary
   const pageRef = useRef(30);
 
   useEffect(() => {
@@ -115,6 +116,10 @@ const JobsList = () => {
     console.log(newValue);
   };
 
+  const handleSalaryFilterChange = (event) => {
+    setSelectedSalary(event.target.value);
+  };
+
   const filteredJobDetailsByRoles =
     selectedJobRoles.length > 0
       ? jobDetails.filter((job) =>
@@ -149,6 +154,13 @@ const JobsList = () => {
       ),
     ];
   }
+
+  const filteredJobDetailsBySalary =
+    selectedSalary !== ""
+      ? filteredJobDetails.filter(
+          (job) => job.minJdSalary !== null && job.minJdSalary >= selectedSalary
+        )
+      : filteredJobDetails;
 
   return (
     <>
@@ -212,9 +224,29 @@ const JobsList = () => {
         />
       </div>
 
+      <div className="ml-2 mb-6 inline-block w-48">
+        <FormControl fullWidth>
+          <InputLabel>Salary</InputLabel>
+          <Select
+            labelId="salary-filter-label"
+            label="Select Salary"
+            id="salary-filter"
+            value={selectedSalary}
+            onChange={handleSalaryFilterChange}
+          >
+            <MenuItem value="">None</MenuItem>
+            {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((salary) => (
+              <MenuItem key={salary} value={salary}>
+                {salary}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+      </div>
+
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-12 gap-y-8">
         {/* Render filtered job details */}
-        {filteredJobDetails.map((job, index) => (
+        {filteredJobDetailsBySalary.map((job, index) => (
           <Card key={index} className="w-11/12">
             <CardContent className="">
               <div className="flex gap-x-2">
