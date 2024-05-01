@@ -1,5 +1,12 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Card, CardContent, CircularProgress, Typography } from "@mui/material";
+import {
+  Button,
+  Card,
+  CardContent,
+  CircularProgress,
+  Typography,
+} from "@mui/material";
+import ElectricBoltIcon from "@mui/icons-material/ElectricBolt";
 
 const JobsList = () => {
   const [jobDetails, setJobDetails] = useState([]);
@@ -101,6 +108,17 @@ const JobsList = () => {
               <Typography color="textSecondary">
                 Experience: {job.minExp} - {job.maxExp} years
               </Typography>
+              <Button
+                className="w-full"
+                variant="contained"
+                color="success"
+                href={job.jdLink}
+                target="_blank"
+                rel="noopener noreferrer"
+                startIcon={<ElectricBoltIcon />}
+              >
+                Easy Apply
+              </Button>
             </CardContent>
           </Card>
         ))}
