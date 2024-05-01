@@ -5,7 +5,7 @@ const JobsList = () => {
   const [jobDetails, setJobDetails] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
-  const pageRef = useRef(0);
+  const pageRef = useRef(17);
 
   useEffect(() => {
     fetchJobDetails();
@@ -88,7 +88,14 @@ const JobsList = () => {
                 {job.jobDetailsFromCompany}
               </Typography>
               <Typography color="textSecondary" gutterBottom>
-                Salary: {job.minJdSalary} - {job.maxJdSalary}{" "}
+                Salary:{" "}
+                {job.minJdSalary != null
+                  ? parseFloat(job.minJdSalary).toFixed(2)
+                  : "N/A"}{" "}
+                -{" "}
+                {job.maxJdSalary != null
+                  ? parseFloat(job.maxJdSalary).toFixed(2)
+                  : "N/A"}{" "}
                 {job.salaryCurrencyCode}
               </Typography>
               <Typography color="textSecondary">
