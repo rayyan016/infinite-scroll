@@ -73,8 +73,8 @@ const JobsList = () => {
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-12 gap-y-8">
-      {jobDetails.map((job) => (
-        <Card key={job.jdUid} className="w-11/12">
+      {jobDetails.map((job, index) => (
+        <Card key={index} className="w-11/12">
           <CardContent className="bg-emerald-100">
             <Typography variant="h5" component="div">
               {job.jobRole}
