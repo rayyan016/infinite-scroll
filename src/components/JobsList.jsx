@@ -7,6 +7,10 @@ import {
   Typography,
   Autocomplete,
   TextField,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
 } from "@mui/material";
 import ElectricBoltIcon from "@mui/icons-material/ElectricBolt";
 
@@ -26,7 +30,8 @@ const JobsList = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const [selectedJobRoles, setSelectedJobRoles] = useState([]); // State to hold selected job roles
-  const pageRef = useRef(17);
+  const [selectedExperience, setSelectedExperience] = useState(""); // State to hold selected experience
+  const pageRef = useRef(30);
 
   useEffect(() => {
     fetchJobDetails();
@@ -97,6 +102,10 @@ const JobsList = () => {
     setSelectedJobRoles(newValue);
   };
 
+  const handleExperienceFilterChange = (event) => {
+    setSelectedExperience(event.target.value);
+  };
+
   const filteredJobDetails =
     selectedJobRoles.length > 0
       ? jobDetails.filter((job) => {
@@ -106,10 +115,16 @@ const JobsList = () => {
         })
       : jobDetails;
 
+  const filteredJobDetailsByExperience =
+    selectedExperience !== ""
+      ? filteredJobDetails.filter(
+          (job) => job.minExp !== null && job.minExp >= selectedExperience
+        )
+      : filteredJobDetails;
   return (
     <>
       <div
-        className="mb-6"
+        className="mb-6 inline-block"
         style={{
           width: `${
             selectedJobRoles.length * 100 < 250
@@ -124,14 +139,36 @@ const JobsList = () => {
           onChange={handleRoleFilterChange}
           options={RolesArray}
           renderInput={(params) => (
-            <TextField {...params} label="Select Job Roles" />
+            <TextField {...params} label="Job Roles" />
           )}
         />
       </div>
 
+      <div className="ml-2 mb-6 inline-block w-48">
+        <FormControl fullWidth>
+          <InputLabel >
+            Select Experience
+          </InputLabel>
+          <Select
+            labelId="experience-filter-label"
+            label="Select Experience"
+            id="experience-filter"
+            value={selectedExperience}
+            onChange={handleExperienceFilterChange}
+          >
+            <MenuItem value="">None</MenuItem>
+            {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((exp) => (
+              <MenuItem key={exp} value={exp}>
+                {exp}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+      </div>
+
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-12 gap-y-8">
         {/* Render filtered job details */}
-        {filteredJobDetails.map((job, index) => (
+        {filteredJobDetailsByExperience.map((job, index) => (
           <Card key={index} className="w-11/12">
             <CardContent className="bg-emerald-100">
               <Typography variant="h5" component="div">
@@ -155,7 +192,8 @@ const JobsList = () => {
                 {job.salaryCurrencyCode}
               </Typography>
               <Typography color="textSecondary">
-                Experience: {job.minExp} - {job.maxExp} years
+                Experience: {job.minExp != null ? job.minExp : "N/A"} -{" "}
+                {job.maxExp != null ? job.maxExp : "N/A"} years
               </Typography>
               <Button
                 className="w-full"
